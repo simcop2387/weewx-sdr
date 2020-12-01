@@ -2496,6 +2496,10 @@ class ARCHolmanWS5029Packet(Packet):
         pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
         return ARCHolmanWS5029Packet.insert_ids(pkt)
 
+    @staticmethod
+    def insert_ids(pkt):
+        station_id = pkt.pop('station_id', '0000')
+        return Packet.add_identifiers(pkt, station_id, ARCHolmanWS5029Packet.__name__)
 
 class PacketFactory(object):
 
