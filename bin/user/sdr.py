@@ -2476,6 +2476,25 @@ class WT0124Packet(Packet):
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         pkt = Packet.add_identifiers(pkt, sensor_id, WT0124Packet.__name__)
         return pkt
+      
+class ARCHolmanWS5029Packet(Packet):
+    # time : 2020-12-02 02:34:58
+    # model : Holman-WS5029 :
+    # {"time" : "2020-12-01 15:25:31", "model" : "Holman-WS5029", "id" : 64896, "temperature_C" : 8.100, "humidity" : 69, "rain_mm" : 83.740, "wind_avg_km_h" : 1, "wind_dir_deg" : 338}
+    IDENTIFIER = "Holman-WS5029"
+
+    @staticmethod
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRICWX
+        pkt['station_id'] = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        pkt['wind_dir'] = Packet.get_float(obj, 'direction_deg')
+        pkt['wind_speed'] = Packet.get_float(obj, 'wind_avg_km_h')
+        pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
+        return ARCHolmanWS5029Packet.insert_ids(pkt)
 
 
 class PacketFactory(object):
@@ -2538,6 +2557,7 @@ class PacketFactory(object):
         TFATwinPlus303049Packet,
         TSFT002Packet,
         WT0124Packet,
+        ARCHolmanWS5029Packet,
         ]
 
     @staticmethod
