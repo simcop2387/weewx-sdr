@@ -2491,7 +2491,7 @@ class ARCHolmanWS5029Packet(Packet):
         pkt['station_id'] = obj.get('id')
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         pkt['humidity'] = Packet.get_float(obj, 'humidity')
-        pkt['wind_dir'] = Packet.get_float(obj, 'direction_deg')
+        pkt['wind_dir'] = Packet.get_float(obj, 'wind_dir_deg')
         pkt['wind_speed'] = Packet.get_float(obj, 'wind_avg_km_h')
         pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
         return ARCHolmanWS5029Packet.insert_ids(pkt)
