@@ -2562,7 +2562,51 @@ class WT0124Packet(Packet):
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         pkt = Packet.add_identifiers(pkt, sensor_id, WT0124Packet.__name__)
         return pkt
+      
+class ARCHolmanWS5029Packet(Packet):
+    # time : 2020-12-02 02:34:58
+    # model : Holman-WS5029 :
+    # {"time" : "2020-12-01 15:25:31", "model" : "Holman-WS5029", "id" : 64896, "temperature_C" : 8.100, "humidity" : 69, "rain_mm" : 83.740, "wind_avg_km_h" : 1, "wind_dir_deg" : 338}
+    IDENTIFIER = "Holman-WS5029"
 
+    @staticmethod
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRICWX
+        pkt['station_id'] = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        pkt['wind_dir'] = Packet.get_float(obj, 'wind_dir_deg')
+        pkt['wind_speed'] = Packet.get_float(obj, 'wind_avg_km_h')
+        pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
+        return ARCHolmanWS5029Packet.insert_ids(pkt)
+
+    @staticmethod
+    def insert_ids(pkt):
+        station_id = pkt.pop('station_id', '0000')
+        return Packet.add_identifiers(pkt, station_id, ARCHolmanWS5029Packet.__name__)
+      
+class NexusTHPacket(Packet):
+    # time : 2020-12-02 02:34:58
+    # model : Nexus-TH :
+    # {"time" : "2020-12-01 15:25:31", "model" : "Holman-WS5029", "id" : 64896, "temperature_C" : 8.100, "humidity" : 69, "rain_mm" : 83.740, "wind_avg_km_h" : 1, "wind_dir_deg" : 338}
+    IDENTIFIER = "Nexus-TH"
+
+    @staticmethod
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRIC
+        pkt['station_id'] = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        return NexusTHPacket.insert_ids(pkt)
+
+    @staticmethod
+    def insert_ids(pkt):
+        station_id = pkt.pop('id', '0000')
+        return Packet.add_identifiers(pkt, station_id, NexusTHPacket.__name__)
 
 class PacketFactory(object):
 
@@ -2627,6 +2671,8 @@ class PacketFactory(object):
         TSFT002Packet,
         WT0124Packet,
         WS2032Packet,
+        ARCHolmanWS5029Packet,
+        NexusTHPacket,
         ]
 
     @staticmethod
