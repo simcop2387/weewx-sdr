@@ -1632,8 +1632,9 @@ class HidekiRainPacket(Packet):
 
 class HolmanWS5029Packet(Packet):
     # {"time" : "2019-08-07 10:35:07", "model" : "Holman Industries WS5029 weather station", "id" : 53761, "temperature_C" : 9.100, "humidity" : 102, "rain_mm" : 39.500, "wind_avg_km_h" : 0, "direction_deg" : 338}
+    #{"time" : "2020-12-31 03:10:25", "model" : "Holman-WS5029", "id" : 55145, "temperature_C" : 26.900, "humidity" : 46, "rain_mm" : 58.460, "wind_avg_km_h" : 0, "wind_dir_deg" : 0}
 
-    IDENTIFIER = "Holman Industries WS5029 weather station"
+    IDENTIFIER = "Holman-WS5029"
 
     @staticmethod
     def parse_json(obj):
@@ -1644,7 +1645,7 @@ class HolmanWS5029Packet(Packet):
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         pkt['humidity'] = Packet.get_float(obj, 'humidity')
         pkt['wind_dir'] = Packet.get_float(obj, 'direction_deg')
-        pkt['wind_speed'] = Packet.get_float(obj, 'wind_avg_km_h')
+        pkt['wind_speed'] = Packet.get_float(obj, 'wind_avg_km_h')/3.6
         pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
         return HolmanWS5029Packet.insert_ids(pkt)
 
