@@ -1081,7 +1081,7 @@ class FOWH1080Packet(Packet):
     # this assumes rain total is in mm
     # this assumes wind speed is kph
 
-    IDENTIFIER = "Fine Offset WH1080 weather station"
+    IDENTIFIER = "Fineoffset-WHx080"
     PARSEINFO = {
 #        'Msg type': ['msg_type', None, None],
         'StationID': ['station_id', None, None],
