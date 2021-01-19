@@ -182,8 +182,9 @@ class ProcManager(object):
         self.stdout_reader = None
         self.stderr_queue = queue.Queue()
         self.stderr_reader = None
+        self.uses_shell = None
 
-    def startup(self, cmd, path=None, ld_library_path=None):
+    def startup(self, cmd, path=None, use_shell=None, ld_library_path=None):
         self._cmd = cmd
         loginf("startup process '%s'" % self._cmd)
         env = os.environ.copy()
@@ -192,7 +193,15 @@ class ProcManager(object):
         if ld_library_path:
             env['LD_LIBRARY_PATH'] = ld_library_path
         try:
-            self._process = subprocess.Popen(cmd.split(' '),
+            if use_shell:
+                self.uses_shell = True
+                self._process = subprocess.Popen(cmd,
+                                             shell=True,
+                                             env=env,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.PIPE)
+            else:
+                self._process = subprocess.Popen(cmd.split(' '),
                                              env=env,
                                              stdout=subprocess.PIPE,
                                              stderr=subprocess.PIPE)
@@ -210,6 +219,8 @@ class ProcManager(object):
         loginf('shutdown process %s' % self._cmd)
         logdbg('waiting for %s' % self.stdout_reader.getName())
         self.stdout_reader.stop_running()
+        if self.uses_shell:
+            os.kill(self._process.pid, signal.SIGTERM)
         self.stdout_reader.join(10.0)
         if self.stdout_reader.isAlive():
             loginf('timed out waiting for %s' % self.stdout_reader.getName())
@@ -2796,10 +2807,11 @@ class SDRDriver(weewx.drivers.AbstractDevice):
         self._counter_values = dict()
         cmd = stn_dict.get('cmd', DEFAULT_CMD)
         path = stn_dict.get('path', None)
+        use_shell = stn_dict.get('use_shell', None)
         ld_library_path = stn_dict.get('ld_library_path', None)
         self._last_pkt = None # avoid duplicate sequential packets
         self._mgr = ProcManager()
-        self._mgr.startup(cmd, path, ld_library_path)
+        self._mgr.startup(cmd, path, use_shell, ld_library_path)
 
     def closePort(self):
         self._mgr.shutdown()
